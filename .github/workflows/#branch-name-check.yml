@@ -7,7 +7,8 @@ on:
     branches-ignore:
       - 'main'
       - 'dev'
-      - "stage"
+      - 'stage'
+      - 'release-please--**'
   pull_request:
     # Run the check when a PR is opened, synchronized (updated), or reopened
     types: [opened, synchronize, reopened]
