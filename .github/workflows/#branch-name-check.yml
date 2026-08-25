@@ -30,7 +30,7 @@ jobs:
           # ^(main|dev|(fix|feat|chore|docs|refactor|style|test)-[A-Z]{1,10}-[0-9]+-[a-z0-9-]+)$
           
           # Check if the branch name DOES NOT match the required pattern
-          if [[ ! "$BRANCH_NAME" =~ ^(main|dev|(fix|feat|chore|docs|refactor|style|test)-[A-Z]{1,10}-[0-9]+-[a-z0-9-]+)$ ]]; then
+          if [[ ! "$BRANCH_NAME" =~ ^(main|dev|release-please--.*|(fix|feat|chore|docs|refactor|style|test)-[A-Z]{1,10}-[0-9]+-[a-z0-9-]+)$ ]]; then
             echo "==============================="
             echo "❌ ERROR: Invalid branch name: '$BRANCH_NAME'"
             echo "==============================="
