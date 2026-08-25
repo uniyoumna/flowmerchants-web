@@ -1,0 +1,61 @@
+name: Commit Message Check
+
+# This workflow runs when code is pushed or a Pull Request is opened/updated.
+on:
+  push:
+    # We ignore the main branches to prevent unnecessary checks after merge
+    branches-ignore:
+      - 'main'
+      - 'dev'
+  pull_request:
+    # Run the check when a PR is opened, synchronized (updated), or reopened
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  check-commit-message:
+    # Runs the job on a fresh Ubuntu environment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      - name: Install Commitlint
+        run: pnpm add -D @commitlint/cli @commitlint/config-conventional
+
+      - name: Print Environment Information
+        run: |
+          echo "==============================="
+          echo "git: $(git --version)"
+          echo "node: $(node --version)"
+          echo "pnpm: $(pnpm --version)"
+          echo "commitlint: $(npx commitlint --version)"
+          echo "==============================="
+
+      - name: Validate Push Commit Message
+        if: github.event_name == 'push'
+        run: |
+          echo "🔍 Checking latest commit message..."
+          npx commitlint --last --verbose
+
+      - name: Validate Pull Request Commit Messages
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "🔍 Checking PR commit history..."
+          npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose

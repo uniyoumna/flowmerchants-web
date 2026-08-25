@@ -1,0 +1,49 @@
+name: Branch Name Check
+
+# This workflow runs when code is pushed or a Pull Request is opened/updated.
+on:
+  push:
+    # We ignore the main branches to prevent unnecessary checks after merge
+    branches-ignore:
+      - 'main'
+      - 'dev'
+      - "stage"
+  pull_request:
+    # Run the check when a PR is opened, synchronized (updated), or reopened
+    types: [opened, synchronize, reopened]
+    
+jobs:
+  check-branch-name:
+    # Runs the job on a fresh Ubuntu environment
+    runs-on: ubuntu-latest
+    
+    # Define the branch name as an environment variable
+    env:
+      # github.head_ref is set for PRs (source branch), ref_name for pushes
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+    steps:
+      - name: Validate Branch Naming Convention
+        run: |
+          # The Regular Expression for valid branch names:
+          # ^(main|dev|(fix|feat|chore|docs|refactor|style|test)-[A-Z]{1,10}-[0-9]+-[a-z0-9-]+)$
+          
+          # Check if the branch name DOES NOT match the required pattern
+          if [[ ! "$BRANCH_NAME" =~ ^(main|dev|(fix|feat|chore|docs|refactor|style|test)-[A-Z]{1,10}-[0-9]+-[a-z0-9-]+)$ ]]; then
+            echo "==============================="
+            echo "❌ ERROR: Invalid branch name: '$BRANCH_NAME'"
+            echo "==============================="
+            echo "Branch Naming Convention Failed. Examples of VALID names:"
+            echo ""
+            echo "  - Bypass Branches: main, dev"
+            echo "  - New Feature:     feat-DASH-1234-add-user-profile-editing"
+            echo "  - Bug Fix:         fix-BUG-42-correct-rtl-sidebar-alignment"
+            echo "  - Maintenance:     chore-INFRA-9-update-npm-dependencies"
+            echo "  - Refactoring:     refactor-CORE-501-simplify-logic"
+            echo "  - Documentation:   docs-WIKI-101-update-api-usage-guide"
+            echo ""
+            echo "Required Pattern: [type]-[PROJECT_CODE]-[TICKET_ID]-[description]"
+            exit 1 # Fails the GitHub Action job
+          fi
+
+          echo "✅ Branch name is valid: $BRANCH_NAME"
