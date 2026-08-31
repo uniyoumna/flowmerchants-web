@@ -17,19 +17,24 @@ const SidebarNav = ({ items }: SidebarNavProps) => {
 
   // Filter items and their sub-items by current user's role
   const visibleItems = useMemo(() => {
+    const userRole = user?.role;
+
     return items
-      .filter((item) => !item.roles || item.roles.includes(user.role))
+      .filter(
+        (item) => !item.roles || (userRole && item.roles.includes(userRole)),
+      )
       .map((item) => {
         if (!item.children) return item;
 
         const filteredChildren = item.children.filter(
-          (child) => !child.roles || child.roles.includes(user.role),
+          (child) =>
+            !child.roles || (userRole && child.roles.includes(userRole)),
         );
 
         return { ...item, children: filteredChildren };
       })
       .filter((item) => !item.children || item.children.length > 0);
-  }, [items, user.role]);
+  }, [items, user?.role]);
 
   // Keep the current route's parent section expanded
   useEffect(() => {

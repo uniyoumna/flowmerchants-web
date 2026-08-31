@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LoginPageContent } from "@/modules/auth/login/components/LoginPageContent";
+import LoginPageContent from "@/modules/auth/login/components/LoginPageContent";
 
 export const metadata: Metadata = {
   title: "Sign In | Flow",

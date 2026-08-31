@@ -131,6 +131,32 @@ export const MOCK_MERCHANTS: Merchant[] = [
     joiningDate: "2024-12-20",
     status: "Active",
   },
+  {
+    id: "9",
+    name: "Giza Construction Materials",
+    arabicName: "الجيزة لمواد البناء",
+    code: "CR-20238801",
+    products: ["Installment"],
+    businessType: "Industrial",
+    owner: "Ahmed Karim",
+    branches: "4/4",
+    expiry: "2025-08-10",
+    joiningDate: "2024-12-28",
+    status: "Active",
+  },
+  {
+    id: "10",
+    name: "Red Sea Sports & Fitness",
+    arabicName: "البحر الأحمر للرياضة",
+    code: "CR-20247734",
+    products: ["BNPL"],
+    businessType: "Sports & Fitness",
+    owner: "Rania Fathy",
+    branches: "2/3",
+    expiry: "2025-10-30",
+    joiningDate: "2024-12-20",
+    status: "Active",
+  },
 ];
 
 export const MERCHANT_STATUS_OPTIONS = [

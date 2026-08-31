@@ -63,7 +63,6 @@ const MerchantsTableCard = ({
           enableSelection={false}
           showSequence={false}
           isDropDownFilter={false}
-          showAll={true}
         />
       </div>
 

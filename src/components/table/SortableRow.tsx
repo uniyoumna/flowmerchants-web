@@ -2,15 +2,13 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { Row } from "@tanstack/react-table";
 import { createContext, useContext, useMemo } from "react";
+import type {
+  SortableRowContextValue,
+  SortableRowProps,
+} from "@/components/table/types";
 import { TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-
-type SortableRowContextValue = {
-  attributes: ReturnType<typeof useSortable>["attributes"];
-  listeners: ReturnType<typeof useSortable>["listeners"];
-};
 
 const SortableRowContext = createContext<SortableRowContextValue | null>(null);
 
@@ -20,14 +18,6 @@ export const useSortableRowContext = () => {
     throw new Error("useSortableRowContext must be used inside SortableRow");
   }
   return context;
-};
-
-type SortableRowProps<TData> = {
-  row: Row<TData>;
-  children: React.ReactNode;
-  enableDragSort: boolean;
-  onClick?: () => void;
-  className?: string;
 };
 
 const SortableRow = <TData,>({

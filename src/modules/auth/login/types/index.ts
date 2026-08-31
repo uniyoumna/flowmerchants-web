@@ -1,21 +1,7 @@
-import type { AuthUser, UserRole } from "@/modules/auth/constants/users";
+export type { LoginCredentials as LoginPayload } from "@/modules/auth/types";
+export * from "@/modules/auth/types";
 
-// ─── Login ───────────────────────────────────────────────────────────────────
-
-type LoginPayload = {
-  email: string;
-  password: string;
-};
-
-type LoginResponse = {
-  token: string;
-  refreshToken?: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    role: UserRole;
-  };
-};
-
-export type { LoginPayload, LoginResponse, UserRole, AuthUser };
+export interface LoginResponse {
+  access: string;
+  refresh: string;
+}

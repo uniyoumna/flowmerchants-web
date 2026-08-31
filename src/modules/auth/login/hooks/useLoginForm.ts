@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { useAuth } from "@/modules/auth/context/AuthContext";
 import {
   type LoginFormValues,
@@ -24,15 +25,21 @@ function useLoginForm() {
   async function onSubmit(data: LoginFormValues) {
     setServerError(null);
 
-    const result = login(data.email, data.password);
+    const result = await login({
+      email: data.email,
+      password: data.password,
+    });
 
     if (!result.success) {
-      setServerError(result.message ?? "Authentication failed");
+      const msg = result.message ?? "Authentication failed";
+      setServerError(msg);
+      toast.error(msg);
       return;
     }
 
-    // Redirect user to their role's specific landing page
-    router.push(result.defaultRoute ?? "/merchants");
+    toast.success("Verification code sent to your email");
+    // Redirect user to OTP verification page
+    router.push("/otp");
   }
 
   return {
