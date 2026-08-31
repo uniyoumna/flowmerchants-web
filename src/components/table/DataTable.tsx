@@ -54,6 +54,7 @@ const DataTable = <TData,>({
 
   enableSelection = false,
   isDropDownFilter = true,
+  persistState = false,
   storageKey = "flow-datatable",
 
   footerConfig,
@@ -140,17 +141,27 @@ const DataTable = <TData,>({
   const [sorting, setSorting] = usePersistentState<SortingState>(
     `${storageKey}-sorting`,
     [],
+    persistState,
   );
 
   const [columnFilters, setColumnFilters] =
-    usePersistentState<ColumnFiltersState>(`${storageKey}-filters`, []);
+    usePersistentState<ColumnFiltersState>(
+      `${storageKey}-filters`,
+      [],
+      persistState,
+    );
 
   const [columnVisibility, setColumnVisibility] =
-    usePersistentState<VisibilityState>(`${storageKey}-visibility`, {});
+    usePersistentState<VisibilityState>(
+      `${storageKey}-visibility`,
+      {},
+      persistState,
+    );
 
-  const [rowSelection, setRowSelection] = usePersistentState<
-    Record<string, boolean>
-  >(`${storageKey}-selection`, {});
+  // Row selection is always ephemeral: ids are only meaningful for the rows
+  // currently on screen, so restoring it against a different page or dataset
+  // selects unrelated rows.
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 
   const finalColumns = useMemo(() => {
     const cols: ColumnDef<TData, unknown>[] = [];

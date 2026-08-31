@@ -16,7 +16,7 @@ const LoginForm = () => {
       <BaseInput
         label="Email"
         type="email"
-        placeholder="uniyoumna@uniparticle.com"
+        placeholder="you@company.com"
         autoComplete="email"
         startIcon={<Mail />}
         error={errors.email?.message}
@@ -26,7 +26,7 @@ const LoginForm = () => {
       {/* Password */}
       <InputPassword
         label="Password"
-        placeholder="123456@Flow"
+        placeholder="Enter your password"
         autoComplete="current-password"
         error={errors.password?.message}
         {...register("password")}

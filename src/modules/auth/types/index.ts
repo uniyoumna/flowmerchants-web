@@ -77,8 +77,14 @@ export function mapApiUserToAuthUser(apiUser: ApiUserResponse): AuthUser {
       ? `${apiUser.first_name[0]}${apiUser.last_name[0]}`.toUpperCase()
       : displayName.slice(0, 2).toUpperCase();
 
-  let role: UserRole = "super_admin";
-  let roleLabel = "Super Admin";
+  // Deny by default: an unmapped backend role gets the `unknown` bucket, which
+  // grants no sidebar entries and leaves the API as the authority on what it can
+  // read. Widening this must be a deliberate edit, never a fallthrough.
+  //
+  // The landing route stays a normal authenticated page: the session is valid,
+  // so sending them to /login would only bounce off the proxy and back.
+  let role: UserRole = "unknown";
+  let roleLabel = "Unassigned Role";
   let defaultRoute = "/merchants";
 
   if (apiUser.is_superuser || apiUser.is_staff) {
@@ -93,10 +99,7 @@ export function mapApiUserToAuthUser(apiUser: ApiUserResponse): AuthUser {
     role = "finance";
     roleLabel = "Flow Finance Officer";
     defaultRoute = "/settlements";
-  } else if (
-    apiUser.merchant_role === "merchant_acquisition" ||
-    apiUser.is_staff
-  ) {
+  } else if (apiUser.merchant_role === "merchant_acquisition") {
     role = "merchant_acquisition";
     roleLabel = "Merchant Acquisition Officer";
     defaultRoute = "/merchants";

@@ -52,7 +52,14 @@ jobs:
       - name: Run Linting
         run: pnpm exec biome check
 
+      - name: Type Check
+        run: pnpm exec tsc --noEmit
+
       - name: Build Project
+        # NEXT_PUBLIC_API_URL is required at build time — src/config/env.ts
+        # throws when it is missing. Set it as a repository variable.
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
         run: pnpm run build
 
       - name: Upload Build Artifacts

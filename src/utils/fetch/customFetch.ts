@@ -18,13 +18,15 @@ async function customFetchCore<T>(
   const {
     method = "GET",
     body,
+    params,
     revalidate,
     tags,
     timeout = 15_000,
     cache,
+    signal: externalSignal,
   } = options;
 
-  const url = buildUrl(path);
+  const url = buildUrl(path, params);
   const headers = await buildHeaders(options);
 
   const fetchInit: RequestInit & { next?: Record<string, unknown> } = {
@@ -48,14 +50,22 @@ async function customFetchCore<T>(
     fetchInit.cache = cache;
   }
 
-  // Timeout controller
+  // Timeout controller — aborts on timeout, or when the caller aborts
   const controller = new AbortController();
   fetchInit.signal = controller.signal;
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+  const abortFromCaller = () => controller.abort();
+  externalSignal?.addEventListener("abort", abortFromCaller, { once: true });
+
+  const cleanup = () => {
+    clearTimeout(timeoutId);
+    externalSignal?.removeEventListener("abort", abortFromCaller);
+  };
+
   try {
     const response = await fetch(url, fetchInit);
-    clearTimeout(timeoutId);
+    cleanup();
 
     let data: T | null = null;
     const contentType = response.headers.get("content-type");
@@ -84,9 +94,14 @@ async function customFetchCore<T>(
       status: response.status,
     };
   } catch (err) {
-    clearTimeout(timeoutId);
+    cleanup();
 
     if (err instanceof DOMException && err.name === "AbortError") {
+      // A caller-driven abort (e.g. a superseded request) is not a timeout
+      if (externalSignal?.aborted) {
+        return { data: null, error: "Request aborted", status: 499 };
+      }
+
       return {
         data: null,
         error: `Request timed out after ${timeout}ms`,

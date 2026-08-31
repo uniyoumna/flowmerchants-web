@@ -1,7 +1,11 @@
 import type { FetchOptions } from "@/utils/fetch/types";
 
 /**
- * Universally resolves access token from cookies on both Server and Client
+ * Resolves the access token for a request.
+ *
+ * Tokens live in `httpOnly` cookies, so only the server can read them. A call
+ * made from the browser therefore goes out unauthenticated by design — route
+ * anything that needs auth through a Server Action or Server Component.
  */
 async function resolveAuthToken(
   explicitToken?: string | null,
@@ -16,17 +20,9 @@ async function resolveAuthToken(
     return null;
   }
 
-  // Auto-resolve in Browser Client
+  // No token is reachable from the browser — see the note above.
   if (typeof window !== "undefined") {
-    try {
-      const { tokenStorage } = await import(
-        "@/modules/auth/utils/tokenStorage"
-      );
-
-      return tokenStorage.getAccessToken();
-    } catch {
-      return null;
-    }
+    return null;
   }
 
   // Auto-resolve on Next.js Server (Server Actions / Server Components)

@@ -15,6 +15,4 @@ export function useAuth(): AuthContextType {
   return context;
 }
 
-// Re-export provider and types for 100% backward compatibility
-export { AuthProvider } from "@/modules/auth/context/AuthProvider";
 export type { AuthContextType } from "@/modules/auth/context/types";

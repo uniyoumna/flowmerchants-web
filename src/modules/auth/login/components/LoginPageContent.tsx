@@ -37,7 +37,7 @@ const LoginPageContent = () => {
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-foreground">Sign in</h2>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              Use a sample account or enter credentials below.
+              Enter your credentials to continue.
             </p>
           </div>
 

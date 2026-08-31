@@ -18,61 +18,41 @@ export function useAuthState(): AuthContextType {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [pendingCredentials, setPendingCredentialsState] =
+
+  const [pendingCredentials, setPendingCredentials] =
     useState<LoginCredentials | null>(null);
-
-  // Synchronize pending credentials with sessionStorage
-  const setPendingCredentials = useCallback(
-    (credentials: LoginCredentials | null) => {
-      setPendingCredentialsState(credentials);
-
-      if (credentials) {
-        tokenStorage.setPendingCredentials(credentials);
-      } else {
-        tokenStorage.clearPendingCredentials();
-      }
-    },
-    [],
-  );
 
   // Hydrate user and session on mount
   useEffect(() => {
     let isMounted = true;
 
     async function hydrateAuth() {
-      try {
-        // Restore pending credentials if present
-        const savedPending = tokenStorage.getPendingCredentials();
-        if (savedPending && isMounted) {
-          setPendingCredentialsState(savedPending);
-        }
-
-        // Restore cached user from client cookie for instant UI rendering
-        const cachedUser = tokenStorage.getUser();
-        if (cachedUser?.email && isMounted) {
-          setUser(cachedUser);
-          setIsAuthenticated(true);
-        }
-
-        // Validate session and retrieve profile via Next.js Server Action
-        const { user: serverUser } = await getCurrentUserAction();
-        if (serverUser && isMounted) {
-          setUser(serverUser);
-          setIsAuthenticated(true);
-        } else if (!cachedUser && isMounted) {
-          setUser(null);
-          setIsAuthenticated(false);
-        }
-      } catch (err) {
-        console.error("Auth hydration error:", err);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+      // Restore cached profile from the (non-secret) cookie for instant UI
+      const cachedUser = tokenStorage.getUser();
+      if (cachedUser?.email && isMounted) {
+        setUser(cachedUser);
+        setIsAuthenticated(true);
       }
+
+      // Validate session and retrieve profile via Next.js Server Action
+      const { user: serverUser } = await getCurrentUserAction();
+
+      if (!isMounted) return;
+
+      if (serverUser) {
+        setUser(serverUser);
+        setIsAuthenticated(true);
+      } else if (!cachedUser) {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+
+      setIsLoading(false);
     }
 
-    hydrateAuth();
+    hydrateAuth().catch(() => {
+      if (isMounted) setIsLoading(false);
+    });
 
     return () => {
       isMounted = false;
@@ -82,47 +62,42 @@ export function useAuthState(): AuthContextType {
   /**
    * Phase 1: Request OTP code via Next.js Server Action
    */
-  const login = useCallback(
-    async (credentials: LoginCredentials) => {
-      const cleanEmail = credentials.email.trim();
-      const cleanPassword = credentials.password;
+  const login = useCallback(async (credentials: LoginCredentials) => {
+    const cleanEmail = credentials.email.trim();
+    const cleanPassword = credentials.password;
 
-      if (!cleanEmail || !cleanPassword) {
-        return {
-          success: false,
-          message: "Please enter both email and password.",
-        };
-      }
-
-      const result = await requestOtpAction({
-        email: cleanEmail,
-        password: cleanPassword,
-      });
-
-      if (!result.success) {
-        return {
-          success: false,
-          message: result.message || "Invalid email or password.",
-        };
-      }
-
-      setPendingCredentials({ email: cleanEmail, password: cleanPassword });
-
+    if (!cleanEmail || !cleanPassword) {
       return {
-        success: true,
+        success: false,
+        message: "Please enter both email and password.",
       };
-    },
-    [setPendingCredentials],
-  );
+    }
+
+    const result = await requestOtpAction({
+      email: cleanEmail,
+      password: cleanPassword,
+    });
+
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message || "Invalid email or password.",
+      };
+    }
+
+    setPendingCredentials({ email: cleanEmail, password: cleanPassword });
+
+    return {
+      success: true,
+    };
+  }, []);
 
   /**
    * Phase 2: Verify OTP code via Next.js Server Action
    */
   const verifyOtp = useCallback(
     async (otp: string) => {
-      const creds = pendingCredentials || tokenStorage.getPendingCredentials();
-
-      if (!creds?.email || !creds?.password) {
+      if (!pendingCredentials?.email || !pendingCredentials?.password) {
         return {
           success: false,
           message:
@@ -139,8 +114,8 @@ export function useAuthState(): AuthContextType {
       }
 
       const result = await verifyOtpAction({
-        email: creds.email,
-        password: creds.password,
+        email: pendingCredentials.email,
+        password: pendingCredentials.password,
         otp: cleanOtp,
       });
 
@@ -160,26 +135,21 @@ export function useAuthState(): AuthContextType {
         defaultRoute: result.defaultRoute || "/merchants",
       };
     },
-    [pendingCredentials, setPendingCredentials],
+    [pendingCredentials],
   );
 
   /**
    * Resend OTP verification code
    */
   const resendOtp = useCallback(async () => {
-    const creds = pendingCredentials || tokenStorage.getPendingCredentials();
-
-    if (!creds?.email || !creds?.password) {
+    if (!pendingCredentials?.email || !pendingCredentials?.password) {
       return {
         success: false,
         message: "No active login session found. Please sign in again.",
       };
     }
 
-    const result = await requestOtpAction({
-      email: creds.email,
-      password: creds.password,
-    });
+    const result = await requestOtpAction(pendingCredentials);
 
     if (!result.success) {
       return {
@@ -199,8 +169,8 @@ export function useAuthState(): AuthContextType {
    */
   const logout = useCallback(async () => {
     await logoutAction();
-    tokenStorage.clearPendingCredentials();
 
+    setPendingCredentials(null);
     setIsAuthenticated(false);
     setUser(null);
 
@@ -225,7 +195,6 @@ export function useAuthState(): AuthContextType {
       isLoading,
       isAuthenticated,
       pendingCredentials,
-      setPendingCredentials,
       login,
       verifyOtp,
       resendOtp,

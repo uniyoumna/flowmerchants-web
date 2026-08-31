@@ -1,41 +1,41 @@
 import { Activity, AlertTriangle, Clock, FileText } from "lucide-react";
 import { MetricCard } from "@/components/base/MetricCard";
+import type { MerchantsOverview } from "../../types";
 
 type MerchantsStatsGridProps = {
-  total?: number;
-  activeCount?: number;
-  pendingCount?: number;
-  blockedCount?: number;
+  overview?: MerchantsOverview;
+  isLoading?: boolean;
 };
 
 const MerchantsStatsGrid = ({
-  total = 10,
-  activeCount = 3,
-  pendingCount = 2,
-  blockedCount = 3,
+  overview,
+  isLoading = false,
 }: MerchantsStatsGridProps) => {
+  const format = (value: number) =>
+    isLoading || !overview ? "—" : value.toLocaleString();
+
   const cards = [
     {
       title: "Total Merchants",
-      value: String(total),
+      value: format(overview?.total ?? 0),
       icon: <FileText className="size-5 text-purple-600" />,
       iconBg: "bg-purple-100 text-purple-600",
     },
     {
       title: "Active",
-      value: String(activeCount),
+      value: format(overview?.active ?? 0),
       icon: <Activity className="size-5 text-emerald-600" />,
       iconBg: "bg-emerald-100 text-emerald-600",
     },
     {
       title: "Pending Action",
-      value: String(pendingCount),
+      value: format(overview?.pending ?? 0),
       icon: <Clock className="size-5 text-amber-600" />,
       iconBg: "bg-amber-100 text-amber-600",
     },
     {
       title: "At Risk / Blocked",
-      value: String(blockedCount),
+      value: format(overview?.atRisk ?? 0),
       icon: <AlertTriangle className="size-5 text-blue-600" />,
       iconBg: "bg-blue-100 text-blue-600",
     },

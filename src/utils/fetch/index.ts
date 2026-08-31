@@ -6,5 +6,7 @@ export type {
   FetchOptions,
   FetchRequestOptions,
   HttpMethod,
+  QueryParams,
+  QueryParamValue,
 } from "@/utils/fetch/types";
-export { buildUrl } from "@/utils/fetch/urlBuilder";
+export { buildQueryString, buildUrl } from "@/utils/fetch/urlBuilder";
