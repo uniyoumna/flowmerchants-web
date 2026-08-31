@@ -10,14 +10,18 @@ import {
   type OtpFormValues,
   otpSchema,
 } from "@/modules/auth/otp/schemas/otpSchema";
-import { tokenStorage } from "@/modules/auth/utils/tokenStorage";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
 export function useOtpForm() {
   const router = useRouter();
-  const { pendingCredentials, verifyOtp, resendOtp, setPendingCredentials } =
-    useAuth();
+  const {
+    pendingCredentials,
+    isAuthenticated,
+    verifyOtp,
+    resendOtp,
+    setPendingCredentials,
+  } = useAuth();
 
   const [serverError, setServerError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -26,10 +30,19 @@ export function useOtpForm() {
   const [isResending, setIsResending] = useState<boolean>(false);
 
   // Active email being authenticated
-  const email =
-    pendingCredentials?.email ||
-    tokenStorage.getPendingCredentials()?.email ||
-    "";
+  const email = pendingCredentials?.email ?? "";
+
+  // Credentials live in memory only, so a reload drops them — there is nothing
+  // to verify against and the user has to sign in again.
+  //
+  // `isAuthenticated` is part of the condition because a *successful* verify
+  // also clears the credentials; without it this effect would bounce the user
+  // back to sign-in at the exact moment they finished signing in.
+  useEffect(() => {
+    if (!pendingCredentials && !isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [pendingCredentials, isAuthenticated, router]);
 
   const form = useForm<OtpFormValues>({
     resolver: zodResolver(otpSchema),
@@ -113,7 +126,6 @@ export function useOtpForm() {
   // Change Email / Back to Login
   const handleBackToLogin = useCallback(() => {
     setPendingCredentials(null);
-    tokenStorage.clearPendingCredentials();
     router.push("/login");
   }, [setPendingCredentials, router]);
 

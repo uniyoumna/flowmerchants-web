@@ -4,7 +4,7 @@ import type {
   LoginCredentials,
   TokenRefreshResponse,
 } from "@/modules/auth/types";
-import { customFetch } from "@/utils/customFetch";
+import { customFetch } from "@/utils/fetch";
 
 export const authService = {
   /**

@@ -34,6 +34,12 @@ export type DataTableProps<TData> = {
 
   isDropDownFilter?: boolean;
   enableSelection?: boolean;
+  /**
+   * Persist sorting, filters and column visibility to `localStorage`.
+   * Off by default — enable it only with a `storageKey` unique to this table.
+   */
+  persistState?: boolean;
+  /** localStorage namespace. Must be unique per table when persisting. */
   storageKey?: string;
 
   footerConfig?: FooterItem[];

@@ -6,6 +6,35 @@ const REFRESH_TOKEN_COOKIE = "flow_refresh_token";
 const ROLE_COOKIE = "flow_role";
 const USER_COOKIE = "flow_user";
 
+const ACCESS_TOKEN_MAX_AGE = 86_400; // 1 day
+const REFRESH_TOKEN_MAX_AGE = 604_800; // 7 days
+
+const isProduction = process.env.NODE_ENV === "production";
+
+/**
+ * Tokens are `httpOnly` — no client script can read them, so an XSS cannot walk
+ * off with a week-long refresh token. Every authenticated request is therefore
+ * made from the server (Server Component or Server Action), never the browser.
+ */
+const tokenCookieOptions = {
+  path: "/",
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: "lax",
+} as const;
+
+/**
+ * The profile cookie is deliberately readable: `useAuthState` hydrates the
+ * avatar and role label from it on mount. It carries no credential.
+ */
+const profileCookieOptions = {
+  path: "/",
+  maxAge: ACCESS_TOKEN_MAX_AGE,
+  httpOnly: false,
+  secure: isProduction,
+  sameSite: "lax",
+} as const;
+
 export const serverTokenStorage = {
   /**
    * Get JWT Access Token from server cookies
@@ -53,17 +82,13 @@ export const serverTokenStorage = {
     const cookieStore = await cookies();
 
     cookieStore.set(ACCESS_TOKEN_COOKIE, access, {
-      path: "/",
-      maxAge: 86400, // 1 day
-      sameSite: "lax",
-      httpOnly: false,
+      ...tokenCookieOptions,
+      maxAge: ACCESS_TOKEN_MAX_AGE,
     });
 
     cookieStore.set(REFRESH_TOKEN_COOKIE, refresh, {
-      path: "/",
-      maxAge: 604800, // 7 days
-      sameSite: "lax",
-      httpOnly: false,
+      ...tokenCookieOptions,
+      maxAge: REFRESH_TOKEN_MAX_AGE,
     });
   },
 
@@ -74,10 +99,8 @@ export const serverTokenStorage = {
     const cookieStore = await cookies();
 
     cookieStore.set(ACCESS_TOKEN_COOKIE, access, {
-      path: "/",
-      maxAge: 86400,
-      sameSite: "lax",
-      httpOnly: false,
+      ...tokenCookieOptions,
+      maxAge: ACCESS_TOKEN_MAX_AGE,
     });
   },
 
@@ -87,19 +110,8 @@ export const serverTokenStorage = {
   async setUser(user: AuthUser): Promise<void> {
     const cookieStore = await cookies();
 
-    cookieStore.set(USER_COOKIE, JSON.stringify(user), {
-      path: "/",
-      maxAge: 86400,
-      sameSite: "lax",
-      httpOnly: false,
-    });
-
-    cookieStore.set(ROLE_COOKIE, user.role, {
-      path: "/",
-      maxAge: 86400,
-      sameSite: "lax",
-      httpOnly: false,
-    });
+    cookieStore.set(USER_COOKIE, JSON.stringify(user), profileCookieOptions);
+    cookieStore.set(ROLE_COOKIE, user.role, profileCookieOptions);
   },
 
   /**

@@ -1,19 +1,16 @@
 import type { ColumnDef } from "@/components/table";
 import { TableActions } from "@/components/table/TableActions";
-import { MerchantProductBadges } from "../components/MerchantProductBadges";
-import { MerchantStatusBadge } from "../components/MerchantStatusBadge";
+import { MerchantProductBadges } from "../components/shared/MerchantProductBadges";
+import { MerchantStatusBadge } from "../components/shared/MerchantStatusBadge";
 import type { Merchant } from "../types";
 
 type CreateMerchantsColumnsOptions = {
-  onView?: (merchant: Merchant) => void;
+  /** Redirects to the merchant's edit page. Remaining row actions come later. */
   onEdit?: (merchant: Merchant) => void;
-  onDelete?: (merchant: Merchant) => void;
 };
 
 export function createMerchantsColumns({
-  onView,
   onEdit,
-  onDelete,
 }: CreateMerchantsColumnsOptions = {}): ColumnDef<Merchant, unknown>[] {
   return [
     {
@@ -105,9 +102,7 @@ export function createMerchantsColumns({
       cell: ({ row }) => (
         <TableActions
           variant="dropdown"
-          onView={() => onView?.(row.original)}
           onEdit={() => onEdit?.(row.original)}
-          onDelete={() => onDelete?.(row.original)}
         />
       ),
     },

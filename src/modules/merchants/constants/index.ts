@@ -1,178 +1,81 @@
-import type { Merchant } from "../types";
+/** Constants for the merchants module. */
+import { ALL_STATUSES, MERCHANT_STATUSES, type MerchantStatus } from "../types";
 
-export const MOCK_MERCHANTS: Merchant[] = [
-  {
-    id: "1",
-    name: "Cairo Electronics Co.",
-    arabicName: "شركة كايرو للإلكترونيات",
-    code: "CR-20241103",
-    products: ["BNPL", "Installment"],
-    businessType: "Electronics",
-    owner: "Sara Hassan",
-    branches: "12/15",
-    expiry: "2025-11-15",
-    joiningDate: "2025-01-08",
-    status: "Active",
-  },
-  {
-    id: "2",
-    name: "Nile Fashion Group",
-    arabicName: "مجموعة نايل للأزياء",
-    code: "CR-20231874",
-    products: ["Installment"],
-    businessType: "Fashion & Apparel",
-    owner: "Ahmed Karim",
-    branches: "8/10",
-    expiry: "2025-03-01",
-    joiningDate: "2025-01-07",
-    status: "Active",
-  },
-  {
-    id: "3",
-    name: "Delta Home Appliances",
-    arabicName: "دلتا للأجهزة المنزلية",
-    code: "CR-20240089",
-    products: ["BNPL", "Installment", "Micro-finance"],
-    businessType: "Home Appliances",
-    owner: "Rania Fathy",
-    branches: "5/8",
-    expiry: "2025-09-22",
-    joiningDate: "2025-01-06",
-    status: "Blocked",
-  },
-  {
-    id: "4",
-    name: "Al-Ahram Auto Trading",
-    arabicName: "الأهرام لتجارة السيارات",
-    code: "CR-20220341",
-    products: ["Auto Finance"],
-    businessType: "Automotive",
-    owner: "Omar Farouk",
-    branches: "3/5",
-    expiry: "2024-12-31",
-    joiningDate: "2025-01-05",
-    status: "Grace Period",
-  },
-  {
-    id: "5",
-    name: "Sphinx Furniture & Decor",
-    arabicName: "أبو الهول للأثاث والديكور",
-    code: "CR-20241289",
-    products: ["BNPL"],
-    businessType: "Furniture",
-    owner: "Sara Hassan",
-    branches: "0/6",
-    expiry: null,
-    joiningDate: "2025-01-04",
-    status: "Pending Compliance",
-  },
-  {
-    id: "6",
-    name: "Eastern Pharma Distribution",
-    arabicName: "الشرق لتوزيع الأدوية",
-    code: "CR-20241401",
-    products: ["Installment", "Healthcare Finance"],
-    businessType: "Healthcare & Pharma",
-    owner: "Laila Nasser",
-    branches: "0/20",
-    expiry: null,
-    joiningDate: "2025-01-03",
-    status: "Pending Finance",
-  },
-  {
-    id: "7",
-    name: "Royal Jewels & Luxury",
-    arabicName: "رويال للمجوهرات والكماليات",
-    code: "CR-20249912",
-    products: null,
-    businessType: "Jewellery & Luxury",
-    owner: "Laila Nasser",
-    branches: "0/5",
-    expiry: null,
-    joiningDate: "2025-01-08",
-    status: "Draft",
-  },
-  {
-    id: "8",
-    name: "Alexandria Hypermarket",
-    arabicName: "هايبر ماركت الإسكندرية",
-    code: "CR-20245512",
-    products: ["BNPL", "Installment"],
-    businessType: "Grocery & Retail",
-    owner: "Mostafa Ali",
-    branches: "18/20",
-    expiry: "2026-05-15",
-    joiningDate: "2025-01-02",
-    status: "Active",
-  },
-  {
-    id: "9",
-    name: "Giza Construction Materials",
-    arabicName: "الجيزة لمواد البناء",
-    code: "CR-20238801",
-    products: ["Installment"],
-    businessType: "Industrial",
-    owner: "Ahmed Karim",
-    branches: "4/4",
-    expiry: "2025-08-10",
-    joiningDate: "2024-12-28",
-    status: "Active",
-  },
-  {
-    id: "10",
-    name: "Red Sea Sports & Fitness",
-    arabicName: "البحر الأحمر للرياضة",
-    code: "CR-20247734",
-    products: ["BNPL"],
-    businessType: "Sports & Fitness",
-    owner: "Rania Fathy",
-    branches: "2/3",
-    expiry: "2025-10-30",
-    joiningDate: "2024-12-20",
-    status: "Active",
-  },
-  {
-    id: "9",
-    name: "Giza Construction Materials",
-    arabicName: "الجيزة لمواد البناء",
-    code: "CR-20238801",
-    products: ["Installment"],
-    businessType: "Industrial",
-    owner: "Ahmed Karim",
-    branches: "4/4",
-    expiry: "2025-08-10",
-    joiningDate: "2024-12-28",
-    status: "Active",
-  },
-  {
-    id: "10",
-    name: "Red Sea Sports & Fitness",
-    arabicName: "البحر الأحمر للرياضة",
-    code: "CR-20247734",
-    products: ["BNPL"],
-    businessType: "Sports & Fitness",
-    owner: "Rania Fathy",
-    branches: "2/3",
-    expiry: "2025-10-30",
-    joiningDate: "2024-12-20",
-    status: "Active",
-  },
+/** Backend status code → human label, straight from the enum's description. */
+export const MERCHANT_STATUS_LABELS: Record<MerchantStatus, string> = {
+  active: "Active",
+  draft: "Draft",
+  pending_compliance_review: "Pending Compliance",
+  pending_finance_setup: "Pending Finance",
+  blocked: "Blocked",
+  grace_period: "Grace Period",
+  deactivated: "Deactivated",
+};
+
+export const MERCHANT_STATUS_STYLES: Record<MerchantStatus, string> = {
+  active: "bg-emerald-50 text-emerald-600 border border-emerald-100/60",
+  blocked: "bg-rose-50 text-rose-600 border border-rose-100/60",
+  grace_period: "bg-amber-50 text-amber-700 border border-amber-100/60",
+  pending_compliance_review:
+    "bg-orange-50 text-orange-700 border border-orange-100/60",
+  pending_finance_setup:
+    "bg-orange-50 text-orange-700 border border-orange-100/60",
+  draft: "bg-slate-100 text-slate-600 border border-slate-200/60",
+  deactivated: "bg-slate-100 text-slate-500 border border-slate-200/60",
+};
+
+/**
+ * Status buckets summed for the "pending action" / "at risk" KPI cards. These are
+ * raw count keys, not `MerchantStatus`: the overview endpoint still reports the
+ * lifecycle states the list itself does not surface.
+ */
+export const PENDING_STATUSES: string[] = [
+  "pending_compliance_review",
+  "pending_finance_setup",
+  "pending_final_compliance_approval",
+  "returned",
+];
+
+export const AT_RISK_STATUSES: string[] = [
+  "blocked",
+  "suspended",
+  "grace_period",
+  "expired",
+  "rejected",
 ];
 
 export const MERCHANT_STATUS_OPTIONS = [
-  { label: "All Statuses", value: "all" },
-  { label: "Active", value: "active" },
-  { label: "Draft", value: "draft" },
-  { label: "Pending Compliance", value: "pending compliance" },
-  { label: "Pending Finance", value: "pending finance" },
-  { label: "Blocked", value: "blocked" },
-  { label: "Grace Period", value: "grace period" },
-  { label: "Deactivated", value: "deactivated" },
+  { label: "All Statuses", value: ALL_STATUSES },
+  ...MERCHANT_STATUSES.map((status) => ({
+    label: MERCHANT_STATUS_LABELS[status],
+    value: status,
+  })),
 ];
 
+/* ─── Merchants list screen ─── */
+
+export const DEFAULT_PAGE_SIZE = 10;
+export const SEARCH_DEBOUNCE_MS = 350;
+
+/** URL query keys — shared by the page (server) and the filter bar (client). */
+export const MERCHANTS_QUERY_KEYS = {
+  search: "search",
+  status: "status",
+  ordering: "ordering",
+  page: "page",
+  pageSize: "page_size",
+} as const;
+
+/** Sentinel for "no explicit ordering" — `BaseSelect` cannot hold an empty value. */
+export const DEFAULT_ORDERING = "none";
+
+/**
+ * Values map 1:1 onto the DRF `ordering` query param. Only these three fields
+ * are supported for ordering, so nothing else is offered.
+ */
 export const MERCHANT_SORT_OPTIONS = [
-  { label: "Sort by", value: "none" },
-  { label: "Name", value: "name" },
-  { label: "Joining Date", value: "joiningDate" },
+  { label: "Sort by", value: DEFAULT_ORDERING },
+  { label: "Name", value: "name_en" },
+  { label: "Joining Date", value: "created_at" },
   { label: "Status", value: "status" },
 ];
