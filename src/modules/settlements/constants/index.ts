@@ -56,3 +56,37 @@ export const SETTLEMENTS_QUERY_KEYS = {
   page: "page",
   pageSize: "page_size",
 } as const;
+
+/* ─── Settlement reports screen ─── */
+
+/**
+ * Tile treatment for the status breakdown. Deliberately separate from
+ * `SETTLEMENT_STATUS_STYLES`: a badge sits inside a dense table row, whereas a
+ * tile is a standalone block and carries a lighter, larger fill.
+ */
+export const SETTLEMENT_STATUS_TILE_STYLES: Record<
+  SettlementStatus,
+  { surface: string; text: string }
+> = {
+  closed: { surface: "bg-emerald-100", text: "text-emerald-700" },
+  processing: { surface: "bg-purple-100", text: "text-[#7C3AED]" },
+  due: { surface: "bg-amber-100", text: "text-amber-700" },
+  overdue: { surface: "bg-rose-100", text: "text-rose-600" },
+  held: { surface: "bg-amber-100", text: "text-amber-700" },
+  upcoming: { surface: "bg-slate-100", text: "text-slate-500" },
+  failed: { surface: "bg-rose-100", text: "text-rose-700" },
+};
+
+/**
+ * Reading order of the breakdown tiles: settled money first, then everything
+ * still owed, then what has not happened yet.
+ */
+export const SETTLEMENT_REPORT_STATUS_ORDER: SettlementStatus[] = [
+  "closed",
+  "processing",
+  "due",
+  "overdue",
+  "held",
+  "upcoming",
+  "failed",
+];

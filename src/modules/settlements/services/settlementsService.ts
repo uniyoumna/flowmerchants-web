@@ -2,14 +2,20 @@ import { customFetch } from "@/utils/fetch";
 import { SETTLEMENTS_PAGE_SIZE } from "../constants";
 import {
   ALL_SETTLEMENTS,
+  type ApiSettlementsReport,
   type ApiSettlementTicket,
   type SettlementActionResult,
   type SettlementsListResult,
   type SettlementsOverview,
   type SettlementsQueryParams,
+  type SettlementsReport,
   type SettlementTicket,
 } from "../types";
 import { mapApiSettlementTicket } from "../utils/settlementMapper";
+import {
+  buildSettlementsReport,
+  mapApiSettlementsReport,
+} from "../utils/settlementsReport";
 import {
   MOCK_SETTLEMENT_TICKETS,
   mockSettlementsOverview,
@@ -174,4 +180,39 @@ export async function exportPaymentFile(
   if (error) return { success: false, error };
 
   return { success: true, error: null, fileUrl: data?.file_url ?? null };
+}
+
+/**
+ * The settlement report across every period.
+ *
+ * While the endpoint is missing the figures are rolled up from the same tickets
+ * the list renders, so the report can never contradict it. Once the endpoint
+ * ships the backend becomes the source and the roll-up is only a fallback.
+ */
+export async function fetchSettlementsReport(): Promise<SettlementsReport> {
+  if (USE_MOCK_SETTLEMENTS) {
+    return buildSettlementsReport(MOCK_SETTLEMENT_TICKETS);
+  }
+
+  const { data, error } = await customFetch.get<ApiSettlementsReport>(
+    `${SETTLEMENTS_ENDPOINT}report/`,
+    { cache: "no-store" },
+  );
+
+  if (error || !data) {
+    return {
+      totals: {
+        gross: 0,
+        netDisbursed: 0,
+        refunds: 0,
+        fees: 0,
+        currency: "EGP",
+      },
+      byMerchant: [],
+      byStatus: [],
+      error: error ?? "Failed to load the settlement report.",
+    };
+  }
+
+  return mapApiSettlementsReport(data);
 }

@@ -127,3 +127,68 @@ export type SettlementActionResult = {
   /** Set when an export produced a downloadable file. */
   fileUrl?: string | null;
 };
+
+// ─── Reports ─────────────────────────────────────────────────────────────────
+
+/** Headline totals across every settlement period. */
+export type SettlementsReportTotals = {
+  gross: number;
+  netDisbursed: number;
+  refunds: number;
+  fees: number;
+  currency: string;
+};
+
+/** One merchant's combined position across all of its tickets. */
+export type MerchantNetSettlement = {
+  merchantId: string;
+  merchantName: string;
+  merchantCode: string;
+  gross: number;
+  refunds: number;
+  net: number;
+  ticketCount: number;
+};
+
+/**
+ * Ticket count and settled value per lifecycle state. `amount` is `null` when
+ * no ticket in that state has been calculated yet — an upcoming batch has a
+ * count but no money attached to it.
+ */
+export type SettlementStatusSummary = {
+  status: SettlementStatus;
+  count: number;
+  amount: number | null;
+};
+
+export type SettlementsReport = {
+  totals: SettlementsReportTotals;
+  byMerchant: MerchantNetSettlement[];
+  byStatus: SettlementStatusSummary[];
+  error: string | null;
+};
+
+/** The API's own report shape, mirrored field for field. */
+export type ApiSettlementsReport = {
+  totals?: {
+    gross?: number | string | null;
+    net_disbursed?: number | string | null;
+    refunds?: number | string | null;
+    fees?: number | string | null;
+    currency?: string | null;
+  } | null;
+  by_merchant?: Array<{
+    merchant_id?: string | null;
+    merchant_name?: string | null;
+    merchant_code?: string | null;
+    gross?: number | string | null;
+    refunds?: number | string | null;
+    net?: number | string | null;
+    ticket_count?: number | null;
+  }> | null;
+  by_status?: Array<{
+    status: string;
+    count?: number | null;
+    amount?: number | string | null;
+  }> | null;
+};
