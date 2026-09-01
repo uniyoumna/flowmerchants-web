@@ -1,10 +1,17 @@
-export default function TeamPage() {
-  return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-slate-900">Team Members</h1>
-      <p className="text-sm text-slate-500">
-        Manage organization team members and system permissions.
-      </p>
-    </div>
-  );
+import type { Metadata } from "next";
+import { TeamMembersPage } from "@/modules/team/components/list/TeamMembersPage";
+
+export const metadata: Metadata = {
+  title: "Team Members",
+  description: "Manage internal users, roles and permissions.",
+};
+
+type TeamPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function TeamPage({ searchParams }: TeamPageProps) {
+  const resolvedSearchParams = await searchParams;
+
+  return <TeamMembersPage searchParams={resolvedSearchParams} />;
 }
