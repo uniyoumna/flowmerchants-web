@@ -1,10 +1,24 @@
-export default function PurchasesPage() {
+import type { Metadata } from "next";
+import { TransactionsListPage } from "@/modules/transactions/components/list/TransactionsListPage";
+
+export const metadata: Metadata = {
+  title: "Purchases",
+  description: "Track and filter merchant purchase transactions.",
+};
+
+type PurchasesPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function PurchasesPage({
+  searchParams,
+}: PurchasesPageProps) {
+  const resolvedSearchParams = await searchParams;
+
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-slate-900">Purchases</h1>
-      <p className="text-sm text-slate-500">
-        View customer purchases and authorizations.
-      </p>
-    </div>
+    <TransactionsListPage
+      scope="purchase"
+      searchParams={resolvedSearchParams}
+    />
   );
 }
