@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { MerchantDetailPage } from "@/modules/merchants/components/detail/MerchantDetailPage";
 
 export const metadata: Metadata = {
   title: "Merchant Details",
@@ -7,20 +8,19 @@ export const metadata: Metadata = {
 
 type MerchantDetailsPageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export default async function MerchantDetailsPage({
   params,
+  searchParams,
 }: MerchantDetailsPageProps) {
-  const { id } = await params;
+  const [{ id }, resolvedSearchParams] = await Promise.all([
+    params,
+    searchParams,
+  ]);
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-slate-900">Merchant Details</h1>
-      <p className="text-sm text-slate-500">
-        Details for merchant <span className="font-mono">{id}</span> are not
-        built yet.
-      </p>
-    </div>
+    <MerchantDetailPage merchantId={id} searchParams={resolvedSearchParams} />
   );
 }

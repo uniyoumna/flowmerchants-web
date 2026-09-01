@@ -35,7 +35,10 @@ async function customFetchCore<T>(
   };
 
   if (body !== undefined && method !== "GET") {
-    fetchInit.body = typeof body === "string" ? body : JSON.stringify(body);
+    fetchInit.body =
+      body instanceof FormData || typeof body === "string"
+        ? body
+        : JSON.stringify(body);
   }
 
   // Next.js cache configuration

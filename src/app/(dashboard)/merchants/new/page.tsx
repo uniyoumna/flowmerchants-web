@@ -1,10 +1,17 @@
-export default function NewMerchantPage() {
-  return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-slate-900">New Merchant</h1>
-      <p className="text-sm text-slate-500">
-        Onboard a new merchant into Flow.
-      </p>
-    </div>
-  );
+import type { Metadata } from "next";
+import { MerchantCreatePage } from "@/modules/merchants/components/create/MerchantCreatePage";
+
+export const metadata: Metadata = {
+  title: "Create New Merchant",
+  description: "Onboard a new merchant into Flow.",
+};
+
+type NewMerchantPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function NewMerchantPage({
+  searchParams,
+}: NewMerchantPageProps) {
+  return <MerchantCreatePage searchParams={await searchParams} />;
 }

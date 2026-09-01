@@ -9,7 +9,7 @@ type DashboardShellProps = {
 const DashboardShell = ({ children }: DashboardShellProps) => {
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-screen overflow-hidden bg-[#F8FAFC]">
+      <div className="fixed inset-0 flex overflow-hidden bg-[#F8FAFC]">
         {/* Sidebar */}
         <Sidebar />
 
@@ -17,8 +17,10 @@ const DashboardShell = ({ children }: DashboardShellProps) => {
         <div className="flex flex-1 flex-col overflow-hidden min-w-0">
           <Navbar />
 
-          <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 lg:p-8">
-            {children}
+          <main className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+            <div className="flex min-h-full flex-col p-6 lg:p-8">
+              {children}
+            </div>
           </main>
         </div>
       </div>
