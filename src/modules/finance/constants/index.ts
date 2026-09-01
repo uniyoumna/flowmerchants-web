@@ -121,3 +121,61 @@ export const FEE_ELIGIBILITY_TOGGLES = [
     description: "Merchant can apply fees on order cancellation",
   },
 ] as const;
+
+/* ─── Merchant wallet screen ─── */
+
+import type { WalletEntryType, WalletStatus } from "../types";
+
+export const WALLET_STATUS_LABELS: Record<WalletStatus, string> = {
+  active: "Active",
+  grace_period: "Grace Period",
+  blocked: "Blocked",
+  pending_compliance: "Pending Compliance",
+  pending_finance: "Pending Finance",
+  no_eligible_branch: "No Eligible Branch",
+  deactivated: "Deactivated",
+  draft: "Draft",
+};
+
+/** `surface` tints the pill; `dot` colours the status light inside it. */
+export const WALLET_STATUS_STYLES: Record<
+  WalletStatus,
+  { surface: string; dot: string }
+> = {
+  active: { surface: "bg-emerald-50 text-emerald-700", dot: "bg-emerald-500" },
+  grace_period: { surface: "bg-amber-50 text-amber-700", dot: "bg-amber-500" },
+  blocked: { surface: "bg-rose-50 text-rose-600", dot: "bg-rose-500" },
+  pending_compliance: {
+    surface: "bg-amber-50 text-amber-700",
+    dot: "bg-amber-500",
+  },
+  pending_finance: {
+    surface: "bg-purple-50 text-[#7C3AED]",
+    dot: "bg-[#7C3AED]",
+  },
+  no_eligible_branch: {
+    surface: "bg-blue-50 text-blue-600",
+    dot: "bg-blue-500",
+  },
+  deactivated: { surface: "bg-slate-100 text-slate-500", dot: "bg-slate-400" },
+  draft: { surface: "bg-slate-100 text-slate-500", dot: "bg-slate-400" },
+};
+
+export const WALLET_ENTRY_TYPE_LABELS: Record<WalletEntryType, string> = {
+  income: "Income",
+  outcome: "Outcome",
+};
+
+export const WALLET_ENTRY_TYPE_STYLES: Record<WalletEntryType, string> = {
+  income: "bg-emerald-50 text-emerald-700",
+  outcome: "bg-rose-50 text-rose-600",
+};
+
+/** URL query key — which merchant's wallet is on screen. */
+export const WALLET_QUERY_KEYS = {
+  merchant: "merchant",
+} as const;
+
+/** Shown beside the ledger count; a merchant starts with an empty wallet. */
+export const WALLET_DEFAULT_BALANCE_NOTE =
+  "Default balance: EGP 0 for new merchants";
