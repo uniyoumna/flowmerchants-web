@@ -1,10 +1,19 @@
-export default function RefundPage() {
+import type { Metadata } from "next";
+import { TransactionsListPage } from "@/modules/transactions/components/list/TransactionsListPage";
+
+export const metadata: Metadata = {
+  title: "Refunds",
+  description: "Track and filter merchant refund transactions.",
+};
+
+type RefundPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function RefundPage({ searchParams }: RefundPageProps) {
+  const resolvedSearchParams = await searchParams;
+
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-slate-900">Refunds</h1>
-      <p className="text-sm text-slate-500">
-        Manage refund requests and chargebacks.
-      </p>
-    </div>
+    <TransactionsListPage scope="refund" searchParams={resolvedSearchParams} />
   );
 }
