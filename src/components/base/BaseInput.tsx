@@ -6,6 +6,12 @@ import { cn } from "@/lib/utils";
 type BaseInputProps = React.ComponentProps<"input"> & {
   /** Label displayed above the input */
   label?: string;
+  /**
+   * Marks the field as required: renders the asterisk and sets `aria-required`.
+   * Deliberately not forwarded as the native `required` attribute — validation
+   * is owned by zod, and the browser bubble would compete with it.
+   */
+  required?: boolean;
   /** Error message — shows red text below the input */
   error?: string;
   /** Helper text — shows muted text below the input */
@@ -20,6 +26,7 @@ type BaseInputProps = React.ComponentProps<"input"> & {
 
 const BaseInput = ({
   label,
+  required,
   error,
   helperText,
   startIcon,
@@ -39,6 +46,7 @@ const BaseInput = ({
           className="text-sm font-medium text-foreground"
         >
           {label}
+          {required && <span className="ml-0.5 text-rose-500">*</span>}
         </Label>
       )}
 
@@ -52,6 +60,7 @@ const BaseInput = ({
         <Input
           id={inputId}
           aria-invalid={!!error}
+          aria-required={required}
           className={cn(
             "h-11 rounded-lg text-sm",
             startIcon && "pl-10",

@@ -1,30 +1,38 @@
+import Link from "next/link";
 import type { ColumnDef } from "@/components/table";
 import { TableActions } from "@/components/table/TableActions";
 import { MerchantProductBadges } from "../components/shared/MerchantProductBadges";
 import { MerchantStatusBadge } from "../components/shared/MerchantStatusBadge";
 import type { Merchant } from "../types";
+import { merchantDetailPath } from "../utils/merchantDetailQuery";
 
 type CreateMerchantsColumnsOptions = {
-  /** Redirects to the merchant's edit page. Remaining row actions come later. */
+  /** Opens the merchant in the onboarding wizard. Other row actions come later. */
   onEdit?: (merchant: Merchant) => void;
+  /** Opens the merchant's detail screen from the row menu. */
+  onView?: (merchant: Merchant) => void;
 };
 
 export function createMerchantsColumns({
   onEdit,
+  onView,
 }: CreateMerchantsColumnsOptions = {}): ColumnDef<Merchant, unknown>[] {
   return [
     {
       accessorKey: "name",
       header: "Type",
       cell: ({ row }) => (
-        <div className="flex flex-col gap-0.5">
-          <span className="font-semibold text-slate-900">
+        <Link
+          href={merchantDetailPath(row.original.id)}
+          className="flex flex-col gap-0.5 rounded-sm transition-colors hover:text-[#7C3AED] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7C3AED]"
+        >
+          <span className="font-semibold text-slate-900 hover:text-[#7C3AED]">
             {row.original.name}
           </span>
-          <span className="text-xs text-slate-400 font-normal">
+          <span className="text-xs font-normal text-slate-400">
             {row.original.arabicName}
           </span>
-        </div>
+        </Link>
       ),
     },
     {
@@ -102,6 +110,7 @@ export function createMerchantsColumns({
       cell: ({ row }) => (
         <TableActions
           variant="dropdown"
+          onView={() => onView?.(row.original)}
           onEdit={() => onEdit?.(row.original)}
         />
       ),

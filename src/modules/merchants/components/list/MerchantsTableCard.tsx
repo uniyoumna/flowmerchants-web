@@ -6,6 +6,8 @@ import { useMemo } from "react";
 import { DataTable } from "@/components/table";
 import { createMerchantsColumns } from "../../columns/merchantsColumns";
 import type { MerchantsListResult } from "../../types";
+import { buildMerchantEditHref } from "../../utils/merchantCreateQuery";
+import { merchantDetailPath } from "../../utils/merchantDetailQuery";
 import { MerchantsPagination } from "./MerchantsPagination";
 
 type MerchantsTableCardProps = {
@@ -23,7 +25,8 @@ const MerchantsTableCard = ({
   const columns = useMemo(
     () =>
       createMerchantsColumns({
-        onEdit: (merchant) => router.push(`/merchants/${merchant.id}`),
+        onView: (merchant) => router.push(merchantDetailPath(merchant.id)),
+        onEdit: (merchant) => router.push(buildMerchantEditHref(merchant.id)),
       }),
     [router],
   );

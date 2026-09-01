@@ -20,7 +20,10 @@ export type ApiResponse<T> = {
 export type FetchOptions = {
   /** HTTP method — defaults to GET */
   method?: HttpMethod;
-  /** Request body — auto-serialized to JSON */
+  /**
+   * Request body. Plain objects are serialized to JSON; `FormData` and strings
+   * pass through untouched (`FormData` also drops the JSON `Content-Type`).
+   */
   body?: unknown;
   /**
    * Query string params — appended to the URL.

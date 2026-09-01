@@ -40,10 +40,13 @@ async function resolveAuthToken(
  * Builds HTTP headers with auto-injected Content-Type and Bearer authorization
  */
 export async function buildHeaders(options: FetchOptions): Promise<Headers> {
-  const headers = new Headers({
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  });
+  const headers = new Headers({ Accept: "application/json" });
+
+  // FormData must set its own Content-Type so the browser can append the
+  // multipart boundary — setting it by hand produces an unparseable body.
+  if (!(options.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
 
   const token = await resolveAuthToken(options.token);
   if (token) {
