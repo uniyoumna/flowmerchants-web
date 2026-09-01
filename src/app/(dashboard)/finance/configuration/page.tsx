@@ -1,12 +1,19 @@
-export default function FinanceConfigPage() {
-  return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-slate-900">
-        Merchant Configuration
-      </h1>
-      <p className="text-sm text-slate-500">
-        Configure financial rules and MDR rates per merchant.
-      </p>
-    </div>
-  );
+import type { Metadata } from "next";
+import { ConfigQueuePage } from "@/modules/finance/components/configuration/ConfigQueuePage";
+
+export const metadata: Metadata = {
+  title: "Merchant Configuration",
+  description: "Set financial parameters for approved merchants.",
+};
+
+type ConfigurationPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function ConfigurationPage({
+  searchParams,
+}: ConfigurationPageProps) {
+  const resolvedSearchParams = await searchParams;
+
+  return <ConfigQueuePage searchParams={resolvedSearchParams} />;
 }
