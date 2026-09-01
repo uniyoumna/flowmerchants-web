@@ -120,3 +120,75 @@ export type ConfigSubmitResult = {
   success: boolean;
   error: string | null;
 };
+
+// ─── Merchant wallet ─────────────────────────────────────────────────────────
+
+/**
+ * Why a wallet can or cannot move money. Only `active` and `grace_period`
+ * merchants hold a spendable balance; the rest are blocked earlier in the
+ * lifecycle, which is why their wallets read zero rather than empty.
+ */
+export const WALLET_STATUSES = [
+  "active",
+  "grace_period",
+  "blocked",
+  "pending_compliance",
+  "pending_finance",
+  "no_eligible_branch",
+  "deactivated",
+  "draft",
+] as const;
+
+export type WalletStatus = (typeof WALLET_STATUSES)[number];
+
+export function isWalletStatus(value: string): value is WalletStatus {
+  return (WALLET_STATUSES as readonly string[]).includes(value);
+}
+
+/** A movement in or out of the wallet. */
+export const WALLET_ENTRY_TYPES = ["income", "outcome"] as const;
+
+export type WalletEntryType = (typeof WALLET_ENTRY_TYPES)[number];
+
+export function isWalletEntryType(value: string): value is WalletEntryType {
+  return (WALLET_ENTRY_TYPES as readonly string[]).includes(value);
+}
+
+/** One merchant in the wallet picker. */
+export type WalletMerchantOption = {
+  merchantId: string;
+  merchantName: string;
+  merchantCode: string;
+};
+
+export type WalletLedgerEntry = {
+  id: string;
+  date: string;
+  description: string;
+  type: WalletEntryType;
+  /** Always positive; `type` carries the direction. */
+  amount: number;
+  balanceAfter: number;
+};
+
+export type MerchantWallet = {
+  merchantId: string;
+  merchantName: string;
+  merchantCode: string;
+  status: WalletStatus;
+  balance: number;
+  /** Summed from the ledger, so the cards cannot contradict the movements. */
+  totalIncome: number;
+  totalOutcome: number;
+  pendingSettlement: number;
+  /** `balance / (balance + pending)` as a whole percent, 0 when both are zero. */
+  utilisation: number;
+  currency: string;
+  ledger: WalletLedgerEntry[];
+};
+
+export type WalletResult = {
+  data: MerchantWallet | null;
+  merchants: WalletMerchantOption[];
+  error: string | null;
+};
